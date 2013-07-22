@@ -2,18 +2,6 @@
 include_once("../globals.php");
 ?>
 
-<html>
-<head>
-
-<link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
-<style type="text/css">
-      .hidden {
-        display:none;
-      }
-      .visible{
-        display:block;
-      }
-</style>
 <script type="text/javascript" language="javascript">
 function toencounter(rawdata) {
 //This is called in the on change event of the Encounter list.
@@ -62,8 +50,8 @@ function showhideMenu() {
 	}
 }
 </script>
-</head>
-<body class="body_title">
+
+
 
 <?php
 $res = sqlQuery("select * from users where username='".$_SESSION{"authUser"}."'");
@@ -102,11 +90,11 @@ $res = sqlQuery("select * from users where username='".$_SESSION{"authUser"}."'"
 
 <td align="right">
 	<table cellspacing="0" cellpadding="1" style="margin:0px 3px 0px 0px;"><tr>
-		<td align="right" class="text" style="vertical-align:text-bottom;"><a href='main_title.php' onclick="javascript:parent.left_nav.goHome();return false;" ><?php xl('Home','e'); ?></a>
+		<td align="right" class="text" style="vertical-align:text-bottom;"><a href='main_title.php' onClick="javascript:parent.left_nav.goHome();return false;" ><?php xl('Home','e'); ?></a>
 		&nbsp;|&nbsp;
 		<a href="http://open-emr.org/wiki/index.php/OpenEMR_4.1.1_Users_Guide" target="_blank" id="help_link" >
 			<?php xl('Manual','e'); ?></a>&nbsp;</td>
-		<td align="right" style="vertical-align:top;"><a href="../logout.php?auth=logout" target="_top" class="css_button_small" style='float:right;' id="logout_link" onclick="top.restoreSession()" >
+		<td align="right" style="vertical-align:top;"><a href="../logout.php?auth=logout" target="_top" class="css_button_small" style='float:right;' id="logout_link" onClick="top.restoreSession()" >
 			<span><?php echo htmlspecialchars( xl('Logout'), ENT_QUOTES) ?></span></a></td>
 	</tr><tr>
 		<td colspan='2' valign="baseline" align='right'><B>
@@ -120,5 +108,3 @@ $res = sqlQuery("select * from users where username='".$_SESSION{"authUser"}."'"
 parent.loadedFrameCount += 1;
 </script>
 
-</body>
-</html>

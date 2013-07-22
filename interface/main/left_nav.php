@@ -298,7 +298,6 @@ function genFindBlock() {
 } // End function genFindBlock()
 
 ?>
-<html>
 <head>
 <title>Navigation</title>
 <link rel="stylesheet" href="<?php echo $css_header;?>" type="text/css">
@@ -1462,5 +1461,4 @@ if (!$GLOBALS['athletic_team']) {
 syncRadios();
 </script>
 
-</body>
-</html>
+

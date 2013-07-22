@@ -33,114 +33,100 @@ else if (!empty($_POST['patientID'])) {
   $patientID = 0 + $_POST['patientID'];
   $frame1url = "../patient_file/summary/demographics.php?set_pid=$patientID";
 }
-else if ($GLOBALS['athletic_team']) {
-  $frame1url = "../reports/players_report.php?embed=1";
-}
+
 else if (isset($_GET['mode']) && $_GET['mode'] == "loadcalendar") {
   $frame1url = "calendar/index.php?pid=" . $_GET['pid'];
   if (isset($_GET['date'])) $frame1url .= "&date=" . $_GET['date'];
 }
-else if ($GLOBALS['concurrent_layout']) {
-  // new layout
-  if ($GLOBALS['default_top_pane']) {
-    $frame1url=$GLOBALS['default_top_pane'];
-  } else {
-    $frame1url = "main_info.php";
-  }
-}
-else {
-  // old layout
-  $frame1url = "main.php?mode=" . $_GET['mode'];
+
+// this allows us to keep our viewtype between screens -- JRM
+$viewtype = 'day';
+if (isset($_SESSION['viewtype'])) { $viewtype = $_SESSION['viewtype']; }
+
+// this allows us to keep our selected providers between screens -- JRM
+$pcuStr = "pc_username=".$_SESSION['authUser'];
+if (isset($_SESSION['pc_username'])) {
+    $pcuStr = "";
+    if (count($_SESSION['pc_username']) > 1) {
+        // loop over the array of values in pc_username to build
+        // a list of pc_username HTTP vars
+        foreach ($_SESSION['pc_username'] as $pcu) {
+            $pcuStr .= "&pc_username[]=".$pcu;
+        }
+    }
+    else {
+        // two possibilities here
+        // 1) pc_username is an array with a single element
+        // 2) pc_username is just a string, not an array
+        if (is_string($_SESSION['pc_username'])) {
+            $pcuStr .= "&pc_username[]=".$_SESSION['pc_username'];
+        }
+        else {
+            $pcuStr .= "&pc_username[]=".$_SESSION['pc_username'][0];
+        }
+    }
 }
 
-$nav_area_width = $GLOBALS['athletic_team'] ? '230' : '130';
-if (!empty($GLOBALS['gbl_nav_area_width'])) $nav_area_width = $GLOBALS['gbl_nav_area_width'];
+
+if ($_SESSION['userauthorized'] && $GLOBALS['docs_see_entire_calendar']) {
+    $framesrc = "calendar/index.php?module=PostCalendar&viewtype=".$viewtype."&func=view";
+}
+else if ($_SESSION['userauthorized']) {
+    $frame1url = "calendar/index.php?module=PostCalendar&viewtype=".$viewtype."&func=view&".$pcuStr;
+}
+else {
+    $frame1url = "calendar/index.php?module=PostCalendar&func=view&viewtype=".$viewtype;
+}
+
 ?>
+
 <html>
 <head>
 <title>
 <?php echo $openemr_name ?>
 </title>
+
 <script type="text/javascript" src="../../library/topdialog.js"></script>
 
 <script language='JavaScript'>
 <?php require($GLOBALS['srcdir'] . "/restoreSession.php"); ?>
 
-// This counts the number of frames that have reported themselves as loaded.
-// Currently only left_nav and Title do this, so the maximum will be 2.
-// This is used to determine when those frames are all loaded.
-var loadedFrameCount = 0;
-
-function allFramesLoaded() {
- // Change this number if more frames participate in reporting.
- return loadedFrameCount >= 2;
+function loadContent() {
+	document.getElementById("main_window").innerHTML="loadContent does not work yet and this is a test";	
+	
 }
+
 </script>
-
+<link rel="stylesheet" href="../../bootstrap/css/bootstrap.css" type="text/css">
 </head>
 
-<?php if ($GLOBALS['concurrent_layout']) { // start new layout ?>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+	<div class="navbar-inner">
+        <div class="container">
+        <?php include ('main_title.php')?>
+        </div>
+    </div>
+</div>
 
-<?php if (empty($GLOBALS['gbl_tall_nav_area'])) { // not tall nav area ?>
+<div class="container-fluid" style="padding-left:0px">
+	<div class="row-fluid">
+    	<div class="span2" style="width:10%; position:fixed;">
+        <?php include ('left_nav.php')?>
+        </div>
+        <div id="main_window" class="span10" style="margin-top:50px; margin-left:180px; width:87%">
+      
+        </div>
+    </div>
+</div>
+         
+</body>
 
-<!-- border (mozilla) and framespacing (ie) are the same thing.      -->
-<!-- frameborder specifies a 3d look, not whether there are borders. -->
-<frameset rows='<?php echo $GLOBALS['titleBarHeight'] + 5 ?>,*' frameborder='1' border='1' framespacing='1' onunload='imclosing()'>
- <frame src='main_title.php' name='Title' scrolling='no' frameborder='1' noresize />
- <frameset cols='<?php echo $nav_area_width; ?>,*' id='fsbody' frameborder='1' border='4' framespacing='4'>
-  <frameset rows='*,0' frameborder='0' border='0' framespacing='0'>
-   <frame src='left_nav.php' name='left_nav' />
-   <frame src='daemon_frame.php' name='Daemon' scrolling='no' frameborder='0'
-    border='0' framespacing='0' />
-  </frameset>
-<?php if (empty($GLOBALS['athletic_team'])) { ?>
-  <frameset rows='60%,*' id='fsright' bordercolor='#999999' frameborder='1'>
-<?php } else { ?>
-  <frameset rows='100%,*' id='fsright' bordercolor='#999999' frameborder='1'>
-<?php } ?>
-   <frame src='<?php echo $frame1url ?>' name='RTop' scrolling='auto' />
-   <frame src='messages/messages.php?form_active=1' name='RBot' scrolling='auto' />
-  </frameset>
- </frameset>
-</frameset>
+<script language="javascript">
+$(document).ready(function() {
+ 
+	$('#main_window').load('<?php echo $frame1url; ?>');
 
-<?php } else { // use tall nav area ?>
-
-<frameset cols='<?php echo $nav_area_width; ?>,*' id='fsbody' frameborder='1' border='4' framespacing='4' onunload='imclosing()'>
- <frameset rows='*,0' frameborder='0' border='0' framespacing='0'>
-  <frame src='left_nav.php' name='left_nav' />
-  <frame src='daemon_frame.php' name='Daemon' scrolling='no' frameborder='0'
-   border='0' framespacing='0' />
- </frameset>
- <frameset rows='<?php echo $GLOBALS['titleBarHeight'] + 5 ?>,*' frameborder='1' border='1' framespacing='1'>
-  <frame src='main_title.php' name='Title' scrolling='no' frameborder='1' />
-<?php if (empty($GLOBALS['athletic_team'])) { ?>
-  <frameset rows='60%,*' id='fsright' bordercolor='#999999' frameborder='1' border='4' framespacing='4'>
-<?php } else { ?>
-  <frameset rows='100%,*' id='fsright' bordercolor='#999999' frameborder='1' border='4' framespacing='4'>
-<?php } ?>
-   <frame src='<?php echo $frame1url ?>' name='RTop' scrolling='auto' />
-   <frame src='messages/messages.php?form_active=1' name='RBot' scrolling='auto' />
-  </frameset>
- </frameset>
-</frameset>
-
-<?php } // end tall nav area ?>
-
-<?php } else { // start old layout ?>
-
-</head>
-<frameset rows="<?php echo "$GLOBALS[navBarHeight],$GLOBALS[titleBarHeight]" ?>,*"
-  cols="*" frameborder="no" border="0" framespacing="0"
-  onunload="imclosing()">
-  <frame src="main_navigation.php" name="Navigation" scrolling="no" noresize frameborder="no">
-  <frame src="main_title.php" name="Title" scrolling="no" noresize frameborder="no">
-  <frame src='<?php echo $frame1url ?>' name='Main' scrolling='auto' noresize frameborder='no'>
-</frameset>
-<noframes><body bgcolor="#FFFFFF">
-Frame support required
-</body></noframes>
-
-<?php } // end old layout ?>
-
+});
+</script>
 </html>
